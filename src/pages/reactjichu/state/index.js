@@ -76,34 +76,35 @@ class Test extends React.Component {
 }
 
 function Test2 () {
-    const [count, setCount] = useState(0)
+    const [state, setState] = useState({count: 100})
 
     function addWork (needAdd) {
         if (needAdd) {
-            setCount(count => count + 1)
+
+            setState(state => {
+                console.log(state)
+                let {...newState} = state
+                newState.count++
+                return newState
+            })
         } else {
-            setCount(count => --count)
+            setState(state => {
+                return {...state, count: state.count--}
+            })
         }
     }
 
-    function addWork2 (needAdd) {
-        if (needAdd) {
-            setCount(count => count + 1)
-        } else {
-            setCount(count => --count)
-        }
-    }
 
-    function addNotWork (needAdd) {
-        console.log('run add2')
-        if (needAdd) {
-            setCount(count + 1)
-        } else {
-            setCount(count - 1)
-        }
-    }
+    // function addNotWork (needAdd) {
+    //     console.log('run add2')
+    //     if (needAdd) {
+    //         setCount(count + 1)
+    //     } else {
+    //         setCount(count - 1)
+    //     }
+    // }
     useEffect(() => {
-        let add = addNotWork
+        let add = addWork
         add(true)
         add(true)
         add(true)
@@ -111,7 +112,7 @@ function Test2 () {
     }, [])
 
     return <div>
-        {count}
+        {state && state.count}
     </div>
 }
 
