@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        div {
+            margin-left: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+</body>
+<script>
+  let result = makeTree([
+    {
+      type: '人类',
+      name: 'yiran男',
+      age: '18',
+      sex: '男',
+    },
+    {
+      type: '人类',
+      name: 'yiran女',
+      age: '18',
+      sex: '女',
+    },
+    {
+      type: '人类',
+      name: 'yanchong',
+      age: '28',
+      sex: '男',
+    },
+    {
+      type: '人类',
+      name: 'dengbo',
+      age: '28',
+      sex: '女',
+    }
+  ], [
+    {
+      key: 'type',
+      name: 'type',
+    },
+    {
+      key: 'sex',
+      name: 'sex',
+    },
+    {
+      key: 'age',
+      name: 'age',
+    },
+
+    {
+      key: 'name',
+      name: 'name',
+    },
+  ])
+  function treeNode(type, attr, childArr) {
+    return {
+      type: type,
+      attr: attr || {},
+      childArr: childArr || [],
+    };
+  }
+  // 传入原始的数组。根据所需要的层次treeKey。进行filter
+  // 返回的是经过排序后的特征数组(具有标识id的数组)
+  // 但是数组内部，会保留排序的情况，至少有一个分组
+  // 将一维数组转化成树
+  // 转化之后，就可以对树进行运算，类似于遍历之类的。
+  function makeTree(arr, treeKey, step = 0) {
+    if (step < treeKey.length) {
+      let newArr = [];
+      arr.forEach(currentEle => {
+        let findNode = newArr.find(exitNode => {
+          return exitNode.type === currentEle[treeKey[step].key];
+        });
+        if (findNode) {
+          findNode.childArr.push(currentEle);
+        } else {
+          let newNode = treeNode(
+            currentEle[treeKey[step].key],
+            { name: currentEle[treeKey[step].name] },
+            [currentEle]
+          );
+          newArr.push(newNode);
+        }
+      });
+      step = step + 1;
+      // 如果需要继续分类，就进行map递归
+      newArr = newArr.map(nextArr => {
+        nextArr.childArr = makeTree(nextArr.childArr, treeKey, step);
+        return nextArr;
+      });
+      return newArr;
+    } else {
+      return arr;
+    }
+  }
+  // 之后可以进行可视化= =来表明节点关系
+  /*
+  我们可以从一维数组，组成任意层次的树。
+  然后可以遍历树，实现对应的逻辑（例如点击按钮实现遍历）
+   */
+  console.log(result)
+  let nodeArr = []
+  document.querySelector('body').appendChild(makeTreeByJson(result))
+  function makeTreeByJson(arrInfo) {
+    let div = document.createElement('div')
+    arrInfo.forEach(item => {
+      if (item && item.childArr && item.childArr.length) {
+        let dom = document.createElement('div')
+        div.appendChild(dom)
+        dom.appendChild((() => {
+          let a = document.createElement('h5')
+          a.innerText = item.attr.name
+          return a
+        })())
+
+        dom.appendChild(makeTreeByJson(item.childArr))
+        nodeArr.push(dom)
+      } else {
+        // div.appendChild(dom)
+      }
+    })
+    return div
+  }
+  let i = -1
+  runLight()
+  function runLight () {
+    window.setInterval(() => {
+      console.log(i)
+      if (nodeArr[i]) {
+        nodeArr[i].style = 'border: none'
+      }
+      i++
+      nodeArr[i].style = 'border: 1px solid red'
+    }, 1000)
+  }
+  console.log(nodeArr)
+</script>
+</html>
